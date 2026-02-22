@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
-from models import db, User, Product, Cart, Order, OrderItem, Review, Coupon, Invoice
+from models import User, Product, Cart, Order, OrderItem, Review, Coupon, Invoice
 from datetime import datetime, timedelta
 import os
 import random
@@ -23,18 +23,22 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-super-secret-key-change-this')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Vercel এনভায়রনমেন্ট চেক
-is_vercel = os.environ.get('VERCEL_ENV') is not None
+# PythonAnywhere এনভায়রনমেন্ট চেক
+is_pythonanywhere = 'PYTHONANYWHERE_DOMAIN' in os.environ
 
-# SQLAlchemy URI - Vercel চেক অনুযায়ী
-if is_vercel:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/shop.db'
+# SQLAlchemy URI - PythonAnywhere অনুযায়ী
+if is_pythonanywhere:
+    # PythonAnywhere-এ পূর্ণ পাথ ব্যবহার করুন
+    db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'shop.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+    print(f"✅ PythonAnywhere detected, database path: {db_path}")
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///shop.db'
+    print("✅ Local environment detected")
 
 # এক্সটেনশন ইনিশিয়ালাইজ
 db = SQLAlchemy()
-db.init_app(app)
+db.init_app(app)  # ✅ এটা সবচেয়ে গুরুত্বপূর্ণ লাইন
 
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
@@ -61,7 +65,13 @@ def generate_otp():
 def save_uploaded_file(file):
     """ফাইল সেভ করার হেল্পার ফাংশন"""
     filename = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}"
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    
+    # PythonAnywhere-এ static/uploads ফোল্ডার আছে কিনা চেক করুন
+    upload_folder = 'static/uploads'
+    if not os.path.exists(upload_folder):
+        os.makedirs(upload_folder, exist_ok=True)
+    
+    filepath = os.path.join(upload_folder, filename)
     file.save(filepath)
     return filename
 
@@ -611,12 +621,17 @@ def view_invoice(order_id):
         db.session.add(invoice)
         db.session.commit()
     
-    return send_file(os.path.join(app.config['INVOICE_FOLDER'], invoice.pdf_path))
+    return send_file(os.path.join('static/invoices', invoice.pdf_path))
 
 def generate_invoice(order):
     """ইনভয়েস জেনারেট করার ফাংশন"""
+    # PythonAnywhere-এ static/invoices ফোল্ডার আছে কিনা চেক করুন
+    invoice_folder = 'static/invoices'
+    if not os.path.exists(invoice_folder):
+        os.makedirs(invoice_folder, exist_ok=True)
+    
     filename = f"invoice_{order.order_number}.pdf"
-    filepath = os.path.join(app.config['INVOICE_FOLDER'], filename)
+    filepath = os.path.join(invoice_folder, filename)
     
     doc = SimpleDocTemplate(filepath, pagesize=A4)
     styles = getSampleStyleSheet()
@@ -781,9 +796,9 @@ def edit_product(id):
         
         image = request.files['image']
         if image:
-            # পুরনো ছবি ডিলিট (শুধু লোকালে)
-            if not is_vercel and product.image:
-                old_file = os.path.join(app.config['UPLOAD_FOLDER'], product.image)
+            # পুরনো ছবি ডিলিট
+            if product.image:
+                old_file = os.path.join('static/uploads', product.image)
                 if os.path.exists(old_file):
                     os.remove(old_file)
             
@@ -804,9 +819,9 @@ def delete_product(id):
     
     product = Product.query.get_or_404(id)
     
-    # পুরনো ছবি ডিলিট (শুধু লোকালে)
-    if not is_vercel and product.image:
-        old_file = os.path.join(app.config['UPLOAD_FOLDER'], product.image)
+    # পুরনো ছবি ডিলিট
+    if product.image:
+        old_file = os.path.join('static/uploads', product.image)
         if os.path.exists(old_file):
             os.remove(old_file)
     
@@ -955,13 +970,18 @@ def order_report(format):
     df = pd.DataFrame(data)
     filename = f'orders_report_{datetime.now().strftime("%Y%m%d_%H%M%S")}'
     
+    # PythonAnywhere-এ static/reports ফোল্ডার তৈরি করুন
+    report_folder = 'static/reports'
+    if not os.path.exists(report_folder):
+        os.makedirs(report_folder, exist_ok=True)
+    
     if format == 'excel':
-        filepath = os.path.join(app.config['REPORT_FOLDER'], f'{filename}.xlsx')
+        filepath = os.path.join(report_folder, f'{filename}.xlsx')
         df.to_excel(filepath, index=False)
         return send_file(filepath, as_attachment=True)
     
     elif format == 'pdf':
-        filepath = os.path.join(app.config['REPORT_FOLDER'], f'{filename}.pdf')
+        filepath = os.path.join(report_folder, f'{filename}.pdf')
         
         doc = SimpleDocTemplate(filepath, pagesize=A4)
         elements = []
@@ -990,7 +1010,9 @@ def order_report(format):
 # ========== মেইন ==========
 if __name__ == '__main__':
     with app.app_context():
+        # ডাটাবেস তৈরি করুন
         db.create_all()
+        print("✅ Database tables created")
         
         # এডমিন ইউজার তৈরি করুন
         if not User.query.filter_by(username='admin').first():
