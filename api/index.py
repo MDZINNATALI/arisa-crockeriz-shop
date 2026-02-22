@@ -1,12 +1,30 @@
-from flask import Flask, request, jsonify, session, redirect, url_for, render_template
+from flask import Flask, request
 import sys
 import os
 
-# মূল app.py থেকে ইম্পোর্ট করার জন্য পাথ যোগ করা
+# পাথ সেটআপ
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app import app as flask_app
+try:
+    from app import app
+    print("✅ App imported successfully")
+except Exception as e:
+    print(f"❌ Error importing app: {e}")
+    import traceback
+    traceback.print_exc()
+    
+    # Fallback app
+    app = Flask(__name__)
+    
+    @app.route('/')
+    def home():
+        return f"Error loading app: {str(e)}"
+    
+    @app.route('/debug')
+    def debug():
+        return f"Python path: {sys.path}"
 
-# Vercel-এর জন্য handler ফাংশন
+# Vercel-এর জন্য handler ফাংশন (সঠিক নাম)
 def handler(event, context):
-    return flask_app
+    """Vercel Python Runtime handler"""
+    return app

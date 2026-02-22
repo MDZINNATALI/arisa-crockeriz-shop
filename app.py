@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
-from models import User, Product, Cart, Order, OrderItem, Review, Coupon, Invoice
+from models import db, User, Product, Cart, Order, OrderItem, Review, Coupon, Invoice
 from datetime import datetime, timedelta
 import os
 import random

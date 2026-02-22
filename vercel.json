@@ -19,9 +19,5 @@
       "src": "/(.*)",
       "dest": "api/index.py"
     }
-  ],
-  "env": {
-    "SECRET_KEY": "arisa-crockeriz-secret-key-2026",
-    "FLASK_ENV": "production"
-  }
+  ]
 }
