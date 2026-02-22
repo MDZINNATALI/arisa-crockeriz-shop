@@ -14,22 +14,33 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 import time
 import json
+import tempfile  # নতুন ইম্পোর্ট
 
 app = Flask(__name__)
 
 # কনফিগারেশন
-app.config['SECRET_KEY'] = 'your-super-secret-key-change-this'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-super-secret-key-change-this')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///shop.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# ছবি আপলোড কনফিগারেশন
-UPLOAD_FOLDER = 'static/uploads'
-REPORT_FOLDER = 'static/reports'
-INVOICE_FOLDER = 'static/invoices'
+# Vercel এনভায়রনমেন্ট চেক
+is_vercel = os.environ.get('VERCEL_ENV') is not None
 
+# ছবি আপলোড কনফিগারেশন
+if is_vercel:
+    # Vercel-এ tmp ফোল্ডার ব্যবহার করুন
+    UPLOAD_FOLDER = '/tmp/uploads'
+    REPORT_FOLDER = '/tmp/reports'
+    INVOICE_FOLDER = '/tmp/invoices'
+else:
+    # লোকালে static ফোল্ডার ব্যবহার করুন
+    UPLOAD_FOLDER = 'static/uploads'
+    REPORT_FOLDER = 'static/reports'
+    INVOICE_FOLDER = 'static/invoices'
+
+# ফোল্ডার তৈরি করুন (যদি না থাকে)
 for folder in [UPLOAD_FOLDER, REPORT_FOLDER, INVOICE_FOLDER]:
-    if not os.path.exists(folder):
-        os.makedirs(folder)
+    os.makedirs(folder, exist_ok=True)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['REPORT_FOLDER'] = REPORT_FOLDER
@@ -59,6 +70,13 @@ def generate_invoice_number():
 
 def generate_otp():
     return str(random.randint(100000, 999999))
+
+def save_uploaded_file(file):
+    """ফাইল সেভ করার হেল্পার ফাংশন"""
+    filename = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}"
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file.save(filepath)
+    return filename
 
 @app.context_processor
 def cart_count():
@@ -609,6 +627,7 @@ def view_invoice(order_id):
     return send_file(os.path.join(app.config['INVOICE_FOLDER'], invoice.pdf_path))
 
 def generate_invoice(order):
+    """ইনভয়েস জেনারেট করার ফাংশন"""
     filename = f"invoice_{order.order_number}.pdf"
     filepath = os.path.join(app.config['INVOICE_FOLDER'], filename)
     
@@ -734,8 +753,7 @@ def add_product():
         
         image = request.files['image']
         if image:
-            filename = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{image.filename}"
-            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            filename = save_uploaded_file(image)
             
             product = Product(
                 name=name,
@@ -776,11 +794,13 @@ def edit_product(id):
         
         image = request.files['image']
         if image:
-            if product.image and os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], product.image)):
-                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], product.image))
+            # পুরনো ছবি ডিলিট (শুধু লোকালে)
+            if not is_vercel and product.image:
+                old_file = os.path.join(app.config['UPLOAD_FOLDER'], product.image)
+                if os.path.exists(old_file):
+                    os.remove(old_file)
             
-            filename = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{image.filename}"
-            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            filename = save_uploaded_file(image)
             product.image = filename
         
         db.session.commit()
@@ -797,8 +817,11 @@ def delete_product(id):
     
     product = Product.query.get_or_404(id)
     
-    if product.image and os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], product.image)):
-        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], product.image))
+    # পুরনো ছবি ডিলিট (শুধু লোকালে)
+    if not is_vercel and product.image:
+        old_file = os.path.join(app.config['UPLOAD_FOLDER'], product.image)
+        if os.path.exists(old_file):
+            os.remove(old_file)
     
     db.session.delete(product)
     db.session.commit()
