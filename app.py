@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, send_file
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_sqlalchemy import SQLAlchemy
 from models import db, User, Product, Cart, Order, OrderItem, Review, Coupon, Invoice
 from datetime import datetime, timedelta
 import os
@@ -14,7 +15,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 import time
 import json
-import tempfile  # নতুন ইম্পোর্ট
+import tempfile
 
 app = Flask(__name__)
 
@@ -26,28 +27,18 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Vercel এনভায়রনমেন্ট চেক
 is_vercel = os.environ.get('VERCEL_ENV') is not None
 
-# ছবি আপলোড কনফিগারেশন
+# SQLAlchemy কনফিগারেশন
 if is_vercel:
-    # Vercel-এ tmp ফোল্ডার ব্যবহার করুন
-    UPLOAD_FOLDER = '/tmp/uploads'
-    REPORT_FOLDER = '/tmp/reports'
-    INVOICE_FOLDER = '/tmp/invoices'
+    # Vercel-এ instance ফোল্ডার ব্যবহার না করা
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/shop.db'
+    
 else:
-    # লোকালে static ফোল্ডার ব্যবহার করুন
-    UPLOAD_FOLDER = 'static/uploads'
-    REPORT_FOLDER = 'static/reports'
-    INVOICE_FOLDER = 'static/invoices'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///shop.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# ফোল্ডার তৈরি করুন (যদি না থাকে)
-for folder in [UPLOAD_FOLDER, REPORT_FOLDER, INVOICE_FOLDER]:
-    os.makedirs(folder, exist_ok=True)
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['REPORT_FOLDER'] = REPORT_FOLDER
-app.config['INVOICE_FOLDER'] = INVOICE_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
 
 # এক্সটেনশন ইনিশিয়ালাইজ
+db = SQLAlchemy()
 db.init_app(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
