@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, send_file
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from flask_sqlalchemy import SQLAlchemy
-from models import db, User, Product, Cart, Order, OrderItem, Review, Coupon, Invoice
+from extensions import db
+from models import User, Product, Cart, Order, OrderItem, Review, Coupon, Invoice
 from datetime import datetime, timedelta
 import os
 import random
@@ -37,8 +37,7 @@ else:
     print("✅ Local environment detected")
 
 # এক্সটেনশন ইনিশিয়ালাইজ
-db = SQLAlchemy()
-db.init_app(app)  # ✅ এটা সবচেয়ে গুরুত্বপূর্ণ লাইন
+db.init_app(app)  # ✅ models.py এর db instance register হবে app এর সাথে
 
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
