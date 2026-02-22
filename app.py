@@ -21,25 +21,21 @@ app = Flask(__name__)
 
 # কনফিগারেশন
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-super-secret-key-change-this')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///shop.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Vercel এনভায়রনমেন্ট চেক
 is_vercel = os.environ.get('VERCEL_ENV') is not None
 
-# SQLAlchemy কনফিগারেশন
+# SQLAlchemy URI - Vercel চেক অনুযায়ী
 if is_vercel:
-    # Vercel-এ instance ফোল্ডার ব্যবহার না করা
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/shop.db'
-    
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///shop.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 
 # এক্সটেনশন ইনিশিয়ালাইজ
 db = SQLAlchemy()
 db.init_app(app)
+
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
