@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}প্রোডাক্ট - আরিসা ক্রোকারিজ অ্যান্ড গ্রোসারি{% endblock %}
+
+{% block extra_css %}
+<style>
+    .products-header {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .products-header h1 {
+        color: #333;
+        margin-bottom: 1rem;
+    }
+    
+    .search-box {
+        max-width: 500px;
+        margin: 0 auto 2rem;
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .search-box input {
+        flex: 1;
+        padding: 0.8rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+    
+    .search-box button {
+        padding: 0.8rem 2rem;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    .categories {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+    }
+    
+    .category-btn {
+        padding: 0.5rem 1.5rem;
+        border: 2px solid #667eea;
+        border-radius: 25px;
+        color: #667eea;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .category-btn:hover,
+    .category-btn.active {
+        background: #667eea;
+        color: white;
+    }
+    
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 2rem;
+    }
+    
+    .product-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .product-image {
+        width: 100%;
+        height: 200px;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+    }
+    
+    .product-info {
+        padding: 1.5rem;
+    }
+    
+    .product-category {
+        color: #667eea;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-name {
+        font-size: 1.2rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-price {
+        font-size: 1.3rem;
+        color: #667eea;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+    
+    .old-price {
+        color: #999;
+        text-decoration: line-through;
+        font-size: 1rem;
+        margin-left: 0.5rem;
+    }
+    
+    .stock-status {
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    
+    .in-stock {
+        color: #28a745;
+    }
+    
+    .out-of-stock {
+        color: #dc3545;
+    }
+    
+    .btn-details {
+        background: #667eea;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        text-decoration: none;
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="products-header">
+    <h1>🛍️ আমাদের প্রোডাক্ট</h1>
+    
+    <form class="search-box" method="GET">
+        <input type="text" name="search" placeholder="প্রোডাক্ট খুঁজুন..." value="{{ request.args.get('search', '') }}">
+        <button type="submit">🔍 সার্চ</button>
+    </form>
+    
+    <div class="categories">
+        <a href="/products?category=all" class="category-btn {% if current_category == 'all' %}active{% endif %}">সব</a>
+        {% for cat in categories %}
+        <a href="/products?category={{ cat }}" class="category-btn {% if current_category == cat %}active{% endif %}">{{ cat }}</a>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="products-grid">
+    {% for product in products %}
+    <div class="product-card">
+        <div class="product-image">
+            {% if product.image %}
+                <img src="{{ url_for('static', filename='uploads/' + product.image) }}" alt="{{ product.name }}" style="width:100%; height:100%; object-fit:cover;">
+            {% else %}
+                <span>📷 নো ইমেজ</span>
+            {% endif %}
+        </div>
+        <div class="product-info">
+            <div class="product-category">{{ product.category }}</div>
+            <h3 class="product-name">{{ product.name }}</h3>
+            <div class="product-price">
+                ৳{{ "%.2f"|format(product.price) }}
+                {% if product.old_price and product.old_price > product.price %}
+                    <span class="old-price">৳{{ "%.2f"|format(product.old_price) }}</span>
+                {% endif %}
+            </div>
+            <div class="stock-status">
+                {% if product.stock > 0 %}
+                    <span class="in-stock">✅ স্টকে আছে ({{ product.stock }}টি)</span>
+                {% else %}
+                    <span class="out-of-stock">❌ স্টক শেষ</span>
+                {% endif %}
+            </div>
+            <a href="/product/{{ product.id }}" class="btn-details">বিস্তারিত দেখুন</a>
+        </div>
+    </div>
+    {% else %}
+    <p style="text-align: center; grid-column: 1/-1; padding: 3rem;">
+        কোনো প্রোডাক্ট পাওয়া যায়নি
+    </p>
+    {% endfor %}
+</div>
+{% endblock %}

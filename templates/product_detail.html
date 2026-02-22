@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - আরিসা ক্রোকারিজ অ্যান্ড গ্রোসারি{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-detail {
+        background: white;
+        border-radius: 10px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        margin-bottom: 3rem;
+    }
+    
+    .product-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        margin-bottom: 2rem;
+    }
+    
+    .product-image {
+        width: 100%;
+        height: 400px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+    }
+    
+    .product-info h1 {
+        color: #333;
+        margin-bottom: 1rem;
+    }
+    
+    .product-meta {
+        margin-bottom: 1.5rem;
+    }
+    
+    .product-category {
+        color: #667eea;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-price {
+        font-size: 2rem;
+        color: #667eea;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+    
+    .old-price {
+        color: #999;
+        text-decoration: line-through;
+        font-size: 1.3rem;
+        margin-left: 1rem;
+    }
+    
+    .stock-info {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 5px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .in-stock {
+        color: #28a745;
+        font-weight: bold;
+    }
+    
+    .out-of-stock {
+        color: #dc3545;
+        font-weight: bold;
+    }
+    
+    .description {
+        margin-bottom: 2rem;
+    }
+    
+    .description h3 {
+        color: #333;
+        margin-bottom: 1rem;
+    }
+    
+    .description p {
+        color: #666;
+        line-height: 1.6;
+    }
+    
+    .quantity-selector {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .quantity-selector input {
+        width: 80px;
+        padding: 0.5rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        text-align: center;
+    }
+    
+    .btn-add-to-cart {
+        background: #667eea;
+        color: white;
+        padding: 1rem 3rem;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+        width: 100%;
+    }
+    
+    .btn-add-to-cart:hover {
+        background: #5a67d8;
+    }
+    
+    .btn-add-to-cart:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+    
+    .related-section {
+        margin-top: 3rem;
+    }
+    
+    .related-section h2 {
+        color: #333;
+        margin-bottom: 2rem;
+    }
+    
+    .related-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+    }
+    
+    .related-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .related-image {
+        width: 100%;
+        height: 150px;
+        background: #f8f9fa;
+    }
+    
+    .related-info {
+        padding: 1rem;
+    }
+    
+    .related-name {
+        font-size: 1rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .related-price {
+        color: #667eea;
+        font-weight: bold;
+    }
+    
+    @media (max-width: 768px) {
+        .product-grid {
+            grid-template-columns: 1fr;
+        }
+        .related-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="product-detail">
+    <div class="product-grid">
+        <div class="product-image">
+            {% if product.image %}
+                <img src="{{ url_for('static', filename='uploads/' + product.image) }}" alt="{{ product.name }}" style="width:100%; height:100%; object-fit:cover;">
+            {% else %}
+                <span style="font-size: 3rem;">📷</span>
+            {% endif %}
+        </div>
+        
+        <div class="product-info">
+            <div class="product-category">{{ product.category }}</div>
+            <h1>{{ product.name }}</h1>
+            
+            <div class="product-price">
+                ৳{{ "%.2f"|format(product.price) }}
+                {% if product.old_price and product.old_price > product.price %}
+                    <span class="old-price">৳{{ "%.2f"|format(product.old_price) }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="stock-info">
+                {% if product.stock > 0 %}
+                    <span class="in-stock">✅ স্টকে আছে ({{ product.stock }}টি)</span>
+                {% else %}
+                    <span class="out-of-stock">❌ স্টক শেষ</span>
+                {% endif %}
+            </div>
+            
+            <div class="description">
+                <h3>প্রোডাক্ট বিবরণ</h3>
+                <p>{{ product.description }}</p>
+            </div>
+            
+            {% if product.stock > 0 %}
+                {% if current_user.is_authenticated %}
+                    <form action="/add-to-cart/{{ product.id }}" method="get">
+                        <div class="quantity-selector">
+                            <label>পরিমাণ:</label>
+                            <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}">
+                        </div>
+                        <button type="submit" class="btn-add-to-cart">🛒 কার্টে যোগ করুন</button>
+                    </form>
+                {% else %}
+                    <p style="text-align: center; color: #666;">কার্টে যোগ করতে <a href="/login">লগইন</a> করুন</p>
+                {% endif %}
+            {% else %}
+                <button class="btn-add-to-cart" disabled>স্টক শেষ</button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if related %}
+<div class="related-section">
+    <h2>সম্পর্কিত প্রোডাক্ট</h2>
+    <div class="related-grid">
+        {% for item in related %}
+        <div class="related-card">
+            <div class="related-image">
+                {% if item.image %}
+                    <img src="{{ url_for('static', filename='uploads/' + item.image) }}" alt="{{ item.name }}" style="width:100%; height:150px; object-fit:cover;">
+                {% endif %}
+            </div>
+            <div class="related-info">
+                <div class="related-name">{{ item.name }}</div>
+                <div class="related-price">৳{{ "%.2f"|format(item.price) }}</div>
+                <a href="/product/{{ item.id }}" style="color: #667eea; text-decoration: none;">দেখুন →</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

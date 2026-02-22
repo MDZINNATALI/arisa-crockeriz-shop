@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}আরিসা ক্রোকারিজ অ্যান্ড গ্রোসারি{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .nav-links a:hover {
+            color: #667eea;
+        }
+        
+        .cart-badge {
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 50%;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        /* Flash Messages */
+        .flash-messages {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        /* Footer */
+        .footer {
+            background: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                justify-content: center;
+            }
+            
+            .logo {
+                font-size: 18px;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">🛍️ আরিসা ক্রোকারিজ অ্যান্ড গ্রোসারি</a>
+            
+            <div class="nav-links">
+                <a href="/">হোম</a>
+                <a href="/products">প্রোডাক্ট</a>
+                <a href="/faq">FAQ</a>
+                
+                {% if current_user.is_authenticated %}
+                    <a href="/profile">প্রোফাইল</a>
+                    <a href="/cart">কার্ট 
+                        {% if cart_count > 0 %}
+                            <span class="cart-badge">{{ cart_count }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="/orders">অর্ডার</a>
+                    {% if current_user.is_admin %}
+                        <a href="/admin">এডমিন</a>
+                    {% endif %}
+                    <a href="/logout">লগআউট</a>
+                {% else %}
+                    <a href="/login">লগইন</a>
+                    <a href="/register">রেজিস্টার</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; ২০২৬ আরিসা ক্রোকারিজ অ্যান্ড গ্রোসারি। সমস্ত অধিকার সংরক্ষিত।</p>
+        <p style="font-size: 12px; color: #999; margin-top: 5px;">Cactus Developer!</p>
+    </div>
+</body>
+</html>

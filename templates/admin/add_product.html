@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}নতুন প্রোডাক্ট - এডমিন{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .form-container h1 {
+        color: #333;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #555;
+        font-weight: 500;
+    }
+    
+    input, textarea, select {
+        width: 100%;
+        padding: 0.8rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+    
+    input:focus, textarea:focus, select:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    
+    textarea {
+        height: 150px;
+        resize: vertical;
+    }
+    
+    .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .checkbox-group input {
+        width: auto;
+    }
+    
+    .btn-submit {
+        width: 100%;
+        padding: 1rem;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    
+    .btn-submit:hover {
+        background: #218838;
+    }
+    
+    .btn-cancel {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 0.8rem 2rem;
+        background: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>➕ নতুন প্রোডাক্ট যোগ করুন</h1>
+    
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>প্রোডাক্টের নাম *</label>
+            <input type="text" name="name" required placeholder="যেমন: স্মার্টফোন">
+        </div>
+        
+        <div class="form-group">
+            <label>বিবরণ *</label>
+            <textarea name="description" required placeholder="প্রোডাক্টের বিস্তারিত বিবরণ দিন"></textarea>
+        </div>
+        
+        <div class="row">
+            <div class="form-group">
+                <label>মূল্য (৳) *</label>
+                <input type="number" name="price" required step="0.01" min="0" placeholder="২৫০০০">
+            </div>
+            
+            <div class="form-group">
+                <label>পুরনো মূল্য (৳)</label>
+                <input type="number" name="old_price" step="0.01" min="0" placeholder="৩০০০০">
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="form-group">
+                <label>ক্যাটাগরি *</label>
+                <select name="category" required>
+                    <option value="">সিলেক্ট করুন</option>
+                    <option value="ইলেকট্রনিক্স">ইলেকট্রনিক্স</option>
+                    <option value="ফ্যাশন">ফ্যাশন</option>
+                    <option value="গৃহস্থালি">গৃহস্থালি</option>
+                    <option value="বই">বই</option>
+                    <option value="খেলনা">খেলনা</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>স্টক পরিমাণ *</label>
+                <input type="number" name="stock" required min="0" placeholder="১০">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>প্রোডাক্টের ছবি</label>
+            <input type="file" name="image" accept="image/*">
+            <small style="color: #999;">শুধু JPG, PNG, GIF ফাইল</small>
+        </div>
+        
+        <div class="form-group checkbox-group">
+            <input type="checkbox" name="featured" id="featured">
+            <label for="featured">হোম পেজে ফিচার্ড হিসেবে দেখান</label>
+        </div>
+        
+        <button type="submit" class="btn-submit">✅ প্রোডাক্ট যোগ করুন</button>
+    </form>
+    
+    <a href="/admin/products" class="btn-cancel">← বাতিল করুন</a>
+</div>
+{% endblock %}

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>এডমিন ড্যাশবোর্ড</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        /* টপ বার */
+        .top-bar {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .top-bar h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .welcome-text {
+            color: #667eea;
+            font-size: 16px;
+        }
+        
+        .welcome-text strong {
+            color: #333;
+        }
+        
+        .home-btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        
+        .home-btn:hover {
+            background: #5a67d8;
+        }
+        
+        /* স্ট্যাটস গ্রিড */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-card h3 {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-number {
+            font-size: 42px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        /* এডমিন মেনু */
+        .admin-menu {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .admin-menu h2 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 22px;
+        }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        
+        .menu-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .menu-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .menu-item a {
+            color: white;
+            text-decoration: none;
+            padding: 20px;
+            display: block;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        /* অর্ডার টেবিল */
+        .orders-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .orders-section h2 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 22px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            color: #333;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-shipped {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-delivered {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+        
+        .no-orders {
+            text-align: center;
+            padding: 50px;
+            color: #999;
+            font-size: 16px;
+        }
+        
+        /* রেস্পন্সিভ ডিজাইন */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .menu-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .top-bar {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- টপ বার -->
+    <div class="top-bar">
+        <div>
+            <h1>📊 এডমিন ড্যাশবোর্ড</h1>
+            <div class="welcome-text">
+                👋 স্বাগতম, <strong>{{ current_user.username }}</strong>! আপনার শপ ম্যানেজ করুন।
+            </div>
+        </div>
+        <a href="/" class="home-btn">🏠 হোম পেজে যান</a>
+    </div>
+
+    <!-- স্ট্যাটস গ্রিড -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📦</div>
+            <h3>মোট প্রোডাক্ট</h3>
+            <div class="stat-number">{{ total_products }}</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">📋</div>
+            <h3>মোট অর্ডার</h3>
+            <div class="stat-number">{{ total_orders }}</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <h3>মোট ইউজার</h3>
+            <div class="stat-number">{{ total_users }}</div>
+        </div>
+    </div>
+
+    <!-- এডমিন মেনু -->
+    <div class="admin-menu">
+        <h2>🔧 এডমিন মেনু</h2>
+        <div class="menu-grid">
+            <div class="menu-item">
+                <a href="/admin/products">📋 সব প্রোডাক্ট</a>
+            </div>
+            <div class="menu-item">
+                <a href="/admin/products/add">➕ নতুন প্রোডাক্ট</a>
+            </div>
+            <div class="menu-item">
+                <a href="/admin/orders">📦 সব অর্ডার</a>
+            </div>
+            <div class="menu-item">
+                <a href="/admin/users">👥 ইউজার লিস্ট</a>
+            </div>
+            <div class="menu-item">
+                <a href="/admin/profile/edit">✏️ প্রোফাইল এডিট</a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- সাম্প্রতিক অর্ডার -->
+    <div class="orders-section">
+        <h2>📋 সাম্প্রতিক অর্ডার</h2>
+        
+        {% if recent_orders %}
+        <table>
+            <thead>
+                <tr>
+                    <th>অর্ডার #</th>
+                    <th>গ্রাহক</th>
+                    <th>মোট</th>
+                    <th>পেমেন্ট</th>
+                    <th>স্ট্যাটাস</th>
+                    <th>তারিখ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in recent_orders %}
+                <tr>
+                    <td>{{ order.order_number }}</td>
+                    <td>{{ order.customer.username }}</td>
+                    <td>৳{{ "%.2f"|format(order.total_amount) }}</td>
+                    <td>{{ order.payment_method }}</td>
+                    <td>
+                        <span class="status-badge status-{{ order.status }}">
+                            {% if order.status == 'pending' %}⏳ পেন্ডিং
+                            {% elif order.status == 'confirmed' %}✅ কনফার্মড
+                            {% elif order.status == 'shipped' %}🚚 শিপড
+                            {% elif order.status == 'delivered' %}📦 ডেলিভারড
+                            {% else %}{{ order.status }}{% endif %}
+                        </span>
+                    </td>
+                    <td>{{ order.created_at.strftime('%d %b, %Y') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-orders">
+            📭 কোনো অর্ডার নেই
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

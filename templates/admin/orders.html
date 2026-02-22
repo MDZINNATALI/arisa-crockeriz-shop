@@ -1,0 +1,421 @@
+{% extends "base.html" %}
+
+{% block title %}অর্ডার লিস্ট - এডমিন{% endblock %}
+
+{% block extra_css %}
+<style>
+    .orders-header {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .orders-header h1 {
+        color: #333;
+        margin-bottom: 0.5rem;
+        font-size: 28px;
+    }
+    
+    .orders-header p {
+        color: #666;
+        margin-bottom: 20px;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .stat-card {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .stat-card .label {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+    
+    .stat-card .value {
+        font-size: 28px;
+        font-weight: bold;
+        color: #667eea;
+    }
+    
+    .filter-bar {
+        display: flex;
+        gap: 15px;
+        margin: 20px 0;
+        flex-wrap: wrap;
+    }
+    
+    .filter-select {
+        padding: 10px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        font-size: 14px;
+        background: white;
+        cursor: pointer;
+    }
+    
+    .filter-select:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    
+    .orders-table {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        overflow-x: auto;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    th {
+        background: #667eea;
+        color: white;
+        padding: 15px;
+        text-align: left;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    td {
+        padding: 15px;
+        border-bottom: 1px solid #e0e0e0;
+        vertical-align: top;
+    }
+    
+    tr:hover td {
+        background: #f8f9fa;
+    }
+    
+    .payment-info {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 13px;
+    }
+    
+    .payment-info p {
+        margin: 5px 0;
+    }
+    
+    .payment-info strong {
+        color: #333;
+    }
+    
+    .transaction-id {
+        font-family: monospace;
+        background: #e9ecef;
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+        display: inline-block;
+    }
+    
+    .payment-status {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-paid {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-failed {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .verify-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 5px;
+    }
+    
+    .btn-approve {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: bold;
+        transition: background 0.3s;
+    }
+    
+    .btn-approve:hover {
+        background: #218838;
+    }
+    
+    .btn-reject {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: bold;
+        transition: background 0.3s;
+    }
+    
+    .btn-reject:hover {
+        background: #c82333;
+    }
+    
+    .verified-badge {
+        color: #28a745;
+        font-weight: bold;
+        padding: 8px 0;
+        display: inline-block;
+    }
+    
+    .rejected-badge {
+        color: #dc3545;
+        font-weight: bold;
+        padding: 8px 0;
+        display: inline-block;
+    }
+    
+    .status-select {
+        padding: 8px;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        font-size: 13px;
+        width: 130px;
+        cursor: pointer;
+    }
+    
+    .status-select:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    
+    .no-data {
+        text-align: center;
+        padding: 50px;
+        color: #999;
+    }
+    
+    .no-data p {
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+    
+    .btn-reset {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+    
+    .btn-reset:hover {
+        background: #5a67d8;
+    }
+    
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .filter-bar {
+            flex-direction: column;
+        }
+        
+        .verify-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="orders-header">
+    <h1>📋 অর্ডার লিস্ট</h1>
+    <p>সব অর্ডার দেখুন, পেমেন্ট ভেরিফাই করুন এবং স্ট্যাটাস আপডেট করুন</p>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="label">⏳ পেন্ডিং পেমেন্ট</div>
+            <div class="value">{{ orders|selectattr('payment_status', 'equalto', 'pending')|list|length }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">✅ পেইড</div>
+            <div class="value">{{ orders|selectattr('payment_status', 'equalto', 'paid')|list|length }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">❌ ফেইলড</div>
+            <div class="value">{{ orders|selectattr('payment_status', 'equalto', 'failed')|list|length }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">💰 মোট আয়</div>
+            <div class="value">৳{{ "%.0f"|format(orders|selectattr('payment_status', 'equalto', 'paid')|sum(attribute='total_amount')) }}</div>
+        </div>
+    </div>
+    
+    <div class="filter-bar">
+        <select class="filter-select" id="paymentFilter" onchange="filterOrders()">
+            <option value="all">সব পেমেন্ট</option>
+            <option value="pending">⏳ পেন্ডিং পেমেন্ট</option>
+            <option value="paid">✅ পেইড</option>
+            <option value="failed">❌ ফেইলড</option>
+        </select>
+        
+        <select class="filter-select" id="statusFilter" onchange="filterOrders()">
+            <option value="all">সব অর্ডার</option>
+            <option value="pending">⏳ পেন্ডিং</option>
+            <option value="confirmed">✅ কনফার্মড</option>
+            <option value="shipped">🚚 শিপড</option>
+            <option value="delivered">📦 ডেলিভারড</option>
+        </select>
+        
+        <button class="btn-reset" onclick="resetFilters()">ফিল্টার রিসেট</button>
+    </div>
+</div>
+
+<div class="orders-table">
+    <table id="ordersTable">
+        <thead>
+            <tr>
+                <th>অর্ডার #</th>
+                <th>গ্রাহক</th>
+                <th>ফোন</th>
+                <th>মোট</th>
+                <th>পেমেন্ট তথ্য</th>
+                <th>পেমেন্ট স্ট্যাটাস</th>
+                <th>অর্ডার স্ট্যাটাস</th>
+                <th>ভেরিফিকেশন</th>
+                <th>তারিখ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr data-payment="{{ order.payment_status }}" data-status="{{ order.status }}">
+                <td><strong>{{ order.order_number }}</strong></td>
+                <td>{{ order.customer.username }}</td>
+                <td>{{ order.phone }}</td>
+                <td><strong>৳{{ "%.2f"|format(order.total_amount) }}</strong></td>
+                <td>
+                    <div class="payment-info">
+                        <p><strong>মেথড:</strong> {{ order.payment_method }}</p>
+                        {% if order.payment_number %}
+                        <p><strong>নম্বর:</strong> {{ order.payment_number }}</p>
+                        {% endif %}
+                        {% if order.transaction_id %}
+                        <p><strong>ট্রাঞ্জেকশন:</strong> 
+                            <span class="transaction-id">{{ order.transaction_id }}</span>
+                        </p>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    <span class="payment-status status-{{ order.payment_status }}">
+                        {% if order.payment_status == 'pending' %}⏳ পেন্ডিং
+                        {% elif order.payment_status == 'paid' %}✅ পেইড
+                        {% elif order.payment_status == 'failed' %}❌ ফেইলড
+                        {% else %}{{ order.payment_status }}{% endif %}
+                    </span>
+                </td>
+                <td>
+                    <form action="/admin/orders/update/{{ order.id }}" method="POST">
+                        <select name="status" class="status-select" onchange="this.form.submit()">
+                            <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>⏳ পেন্ডিং</option>
+                            <option value="confirmed" {% if order.status == 'confirmed' %}selected{% endif %}>✅ কনফার্মড</option>
+                            <option value="shipped" {% if order.status == 'shipped' %}selected{% endif %}>🚚 শিপড</option>
+                            <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>📦 ডেলিভারড</option>
+                        </select>
+                    </form>
+                </td>
+                <td>
+                    {% if order.payment_status == 'pending' and order.transaction_id %}
+                        <div class="verify-buttons">
+                            <form action="/admin/verify-payment/{{ order.id }}" method="POST" style="display: inline;">
+                                <input type="hidden" name="action" value="approve">
+                                <button type="submit" class="btn-approve" onclick="return confirm('আপনি কি এই পেমেন্ট অ্যাপ্রুভ করতে চান?')">✅ অ্যাপ্রুভ</button>
+                            </form>
+                            <form action="/admin/verify-payment/{{ order.id }}" method="POST" style="display: inline;">
+                                <input type="hidden" name="action" value="reject">
+                                <button type="submit" class="btn-reject" onclick="return confirm('আপনি কি এই পেমেন্ট রিজেক্ট করতে চান?')">❌ রিজেক্ট</button>
+                            </form>
+                        </div>
+                    {% elif order.payment_status == 'paid' %}
+                        <span class="verified-badge">✅ ভেরিফাইড</span>
+                    {% elif order.payment_status == 'failed' %}
+                        <span class="rejected-badge">❌ রিজেক্টেড</span>
+                    {% else %}
+                        <span style="color: #999;">পেমেন্ট তথ্য নেই</span>
+                    {% endif %}
+                </td>
+                <td>{{ order.created_at.strftime('%d %b, %Y') }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="9" class="no-data">
+                    <p>📭 কোনো অর্ডার নেই</p>
+                    <small>যখন কেউ অর্ডার দিবে, তখন এখানে দেখাবে</small>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+function filterOrders() {
+    const paymentFilter = document.getElementById('paymentFilter').value;
+    const statusFilter = document.getElementById('statusFilter').value;
+    const rows = document.querySelectorAll('#ordersTable tbody tr');
+    
+    rows.forEach(row => {
+        const paymentStatus = row.dataset.payment;
+        const orderStatus = row.dataset.status;
+        
+        let show = true;
+        
+        if (paymentFilter !== 'all' && paymentStatus !== paymentFilter) {
+            show = false;
+        }
+        
+        if (statusFilter !== 'all' && orderStatus !== statusFilter) {
+            show = false;
+        }
+        
+        row.style.display = show ? '' : 'none';
+    });
+}
+
+function resetFilters() {
+    document.getElementById('paymentFilter').value = 'all';
+    document.getElementById('statusFilter').value = 'all';
+    filterOrders();
+}
+</script>
+{% endblock %}

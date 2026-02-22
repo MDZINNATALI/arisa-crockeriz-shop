@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}প্রোডাক্ট এডিট - এডমিন{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .form-container h1 {
+        color: #333;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #555;
+        font-weight: 500;
+    }
+    
+    input, textarea, select {
+        width: 100%;
+        padding: 0.8rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+    
+    textarea {
+        height: 150px;
+        resize: vertical;
+    }
+    
+    .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    
+    .current-image {
+        margin: 1rem 0;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 5px;
+        text-align: center;
+    }
+    
+    .current-image img {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 5px;
+    }
+    
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-submit {
+        width: 100%;
+        padding: 1rem;
+        background: #4ecdc4;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    
+    .btn-cancel {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 0.8rem 2rem;
+        background: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>✏️ প্রোডাক্ট এডিট করুন</h1>
+    
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>প্রোডাক্টের নাম *</label>
+            <input type="text" name="name" value="{{ product.name }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label>বিবরণ *</label>
+            <textarea name="description" required>{{ product.description }}</textarea>
+        </div>
+        
+        <div class="row">
+            <div class="form-group">
+                <label>মূল্য (৳) *</label>
+                <input type="number" name="price" value="{{ product.price }}" required step="0.01" min="0">
+            </div>
+            
+            <div class="form-group">
+                <label>পুরনো মূল্য (৳)</label>
+                <input type="number" name="old_price" value="{{ product.old_price or '' }}" step="0.01" min="0">
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="form-group">
+                <label>ক্যাটাগরি *</label>
+                <select name="category" required>
+                    <option value="ইলেকট্রনিক্স" {% if product.category == 'ইলেকট্রনিক্স' %}selected{% endif %}>ইলেকট্রনিক্স</option>
+                    <option value="ফ্যাশন" {% if product.category == 'ফ্যাশন' %}selected{% endif %}>ফ্যাশন</option>
+                    <option value="গৃহস্থালি" {% if product.category == 'গৃহস্থালি' %}selected{% endif %}>গৃহস্থালি</option>
+                    <option value="বই" {% if product.category == 'বই' %}selected{% endif %}>বই</option>
+                    <option value="খেলনা" {% if product.category == 'খেলনা' %}selected{% endif %}>খেলনা</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>স্টক পরিমাণ *</label>
+                <input type="number" name="stock" value="{{ product.stock }}" required min="0">
+            </div>
+        </div>
+        
+        {% if product.image %}
+        <div class="current-image">
+            <p>বর্তমান ছবি:</p>
+            <img src="{{ url_for('static', filename='uploads/' + product.image) }}" alt="{{ product.name }}">
+        </div>
+        {% endif %}
+        
+        <div class="form-group">
+            <label>নতুন ছবি (ঐচ্ছিক)</label>
+            <input type="file" name="image" accept="image/*">
+            <small style="color: #999;">নতুন ছবি দিতে চাইলে সিলেক্ট করুন</small>
+        </div>
+        
+        <div class="form-group checkbox-group">
+            <input type="checkbox" name="featured" id="featured" {% if product.featured %}checked{% endif %}>
+            <label for="featured">হোম পেজে ফিচার্ড হিসেবে দেখান</label>
+        </div>
+        
+        <button type="submit" class="btn-submit">✅ আপডেট করুন</button>
+    </form>
+    
+    <a href="/admin/products" class="btn-cancel">← বাতিল করুন</a>
+</div>
+{% endblock %}

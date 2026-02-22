@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}অর্ডার #{{ order.order_number }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .order-detail {
+        background: white;
+        border-radius: 10px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .order-header h1 {
+        color: #333;
+    }
+    
+    .order-status {
+        padding: 0.5rem 2rem;
+        border-radius: 25px;
+        font-weight: bold;
+    }
+    
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-confirmed {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .info-card {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 10px;
+    }
+    
+    .info-card h3 {
+        color: #333;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .info-row {
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-label {
+        color: #666;
+        font-weight: 500;
+        margin-right: 0.5rem;
+    }
+    
+    .info-value {
+        color: #333;
+    }
+    
+    .items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+    
+    .items-table th {
+        background: #667eea;
+        color: white;
+        padding: 1rem;
+        text-align: left;
+    }
+    
+    .items-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .items-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .total-row {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+    
+    .total-row td {
+        padding-top: 1rem;
+        border-top: 2px solid #e0e0e0;
+    }
+    
+    .payment-proof {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .btn-back {
+        display: inline-block;
+        margin-top: 2rem;
+        padding: 1rem 2rem;
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="order-detail">
+    <div class="order-header">
+        <h1>অর্ডার #{{ order.order_number }}</h1>
+        <span class="order-status status-{{ order.status }}">
+            {% if order.status == 'pending' %}⏳ পেন্ডিং
+            {% elif order.status == 'confirmed' %}✅ কনফার্মড
+            {% elif order.status == 'shipped' %}🚚 শিপড
+            {% elif order.status == 'delivered' %}📦 ডেলিভারড
+            {% else %}{{ order.status }}{% endif %}
+        </span>
+    </div>
+    
+    <div class="info-grid">
+        <div class="info-card">
+            <h3>অর্ডার তথ্য</h3>
+            <div class="info-row">
+                <span class="info-label">অর্ডার তারিখ:</span>
+                <span class="info-value">{{ order.created_at.strftime('%d %B, %Y %I:%M %p') }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">পেমেন্ট মেথড:</span>
+                <span class="info-value">{{ order.payment_method }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">পেমেন্ট নম্বর:</span>
+                <span class="info-value">{{ order.payment_number or '-' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">ট্রাঞ্জেকশন আইডি:</span>
+                <span class="info-value">{{ order.transaction_id or '-' }}</span>
+            </div>
+        </div>
+        
+        <div class="info-card">
+            <h3>ডেলিভারি তথ্য</h3>
+            <div class="info-row">
+                <span class="info-label">নাম:</span>
+                <span class="info-value">{{ order.customer.username }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">ফোন:</span>
+                <span class="info-value">{{ order.phone }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">ঠিকানা:</span>
+                <span class="info-value">{{ order.shipping_address }}</span>
+            </div>
+            {% if order.notes %}
+            <div class="info-row">
+                <span class="info-label">নোট:</span>
+                <span class="info-value">{{ order.notes }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <h3>অর্ডার আইটেম</h3>
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>প্রোডাক্ট</th>
+                <th>দাম</th>
+                <th>পরিমাণ</th>
+                <th>মোট</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items %}
+            <tr>
+                <td>{{ item.product_name }}</td>
+                <td>৳{{ "%.2f"|format(item.price) }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>৳{{ "%.2f"|format(item.price * item.quantity) }}</td>
+            </tr>
+            {% endfor %}
+            <tr class="total-row">
+                <td colspan="3" style="text-align: right;">সর্বমোট:</td>
+                <td>৳{{ "%.2f"|format(order.total_amount) }}</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <a href="/orders" class="btn-back">← আমার অর্ডারে ফিরে যান</a>
+</div>
+{% endblock %}

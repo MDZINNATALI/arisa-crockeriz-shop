@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}হোম - আরিসা ক্রোকারিজ অ্যান্ড গ্রোসারি {% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4rem 2rem;
+        text-align: center;
+        border-radius: 10px;
+        margin-bottom: 3rem;
+    }
+    
+    .hero h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .hero p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .btn-shop {
+        background: white;
+        color: #667eea;
+        padding: 1rem 2rem;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: transform 0.3s;
+        display: inline-block;
+    }
+    
+    .btn-shop:hover {
+        transform: translateY(-3px);
+    }
+    
+    .section-title {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .product-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .product-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+    }
+    
+    .product-info {
+        padding: 1.5rem;
+    }
+    
+    .product-name {
+        font-size: 1.2rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-price {
+        font-size: 1.3rem;
+        color: #667eea;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+    
+    .old-price {
+        color: #999;
+        text-decoration: line-through;
+        font-size: 1rem;
+        margin-left: 0.5rem;
+    }
+    
+    .btn-add {
+        background: #667eea;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        text-decoration: none;
+        display: inline-block;
+        transition: background 0.3s;
+    }
+    
+    .btn-add:hover {
+        background: #5a67d8;
+    }
+    
+    .categories {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+    
+    .category-tag {
+        background: white;
+        color: #667eea;
+        padding: 0.5rem 1.5rem;
+        border-radius: 25px;
+        text-decoration: none;
+        border: 2px solid #667eea;
+        transition: all 0.3s;
+    }
+    
+    .category-tag:hover {
+        background: #667eea;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>🛍️ আরিসা ক্রোকারিজ অ্যান্ড গ্রোসারি শপে স্বাগতম</h1>
+    <p>সেরা প্রোডাক্ট, সেরা দামে</p>
+    <a href="/products" class="btn-shop">শপিং শুরু করুন →</a>
+</div>
+
+<div class="categories">
+    <a href="/products?category=all" class="category-tag">সব প্রোডাক্ট</a>
+    <a href="/products?category=ইলেকট্রনিক্স" class="category-tag">ইলেকট্রনিক্স</a>
+    <a href="/products?category=ফ্যাশন" class="category-tag">ফ্যাশন</a>
+    <a href="/products?category=গৃহস্থালি" class="category-tag">গৃহস্থালি</a>
+</div>
+
+<h2 class="section-title">🔥 ফিচার্ড প্রোডাক্ট</h2>
+<div class="products-grid">
+    {% for product in featured_products %}
+    <div class="product-card">
+        <div class="product-image">
+            {% if product.image %}
+                <img src="{{ url_for('static', filename='uploads/' + product.image) }}" alt="{{ product.name }}" style="width:100%; height:100%; object-fit:cover;">
+            {% else %}
+                <span>📷 নো ইমেজ</span>
+            {% endif %}
+        </div>
+        <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <div class="product-price">
+                ৳{{ "%.2f"|format(product.price) }}
+                {% if product.old_price and product.old_price > product.price %}
+                    <span class="old-price">৳{{ "%.2f"|format(product.old_price) }}</span>
+                {% endif %}
+            </div>
+            <a href="/product/{{ product.id }}" class="btn-add">বিস্তারিত</a>
+        </div>
+    </div>
+    {% else %}
+    <p style="text-align: center; grid-column: 1/-1;">কোনো প্রোডাক্ট নেই</p>
+    {% endfor %}
+</div>
+
+<h2 class="section-title">🆕 নতুন প্রোডাক্ট</h2>
+<div class="products-grid">
+    {% for product in new_products %}
+    <div class="product-card">
+        <div class="product-image">
+            {% if product.image %}
+                <img src="{{ url_for('static', filename='uploads/' + product.image) }}" alt="{{ product.name }}" style="width:100%; height:100%; object-fit:cover;">
+            {% else %}
+                <span>📷 নো ইমেজ</span>
+            {% endif %}
+        </div>
+        <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <div class="product-price">৳{{ "%.2f"|format(product.price) }}</div>
+            <a href="/product/{{ product.id }}" class="btn-add">বিস্তারিত</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

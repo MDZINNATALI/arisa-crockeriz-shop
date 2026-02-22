@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}ইমেইল ভেরিফিকেশন{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 50px auto; background: white; padding: 30px; border-radius: 10px;">
+    <h2 style="text-align: center; margin-bottom: 30px;">📧 ইমেইল ভেরিফিকেশন</h2>
+    
+    <p style="text-align: center; margin-bottom: 20px;">
+        আপনার ইমেইলে ৬ ডিজিটের একটি কোড পাঠানো হয়েছে
+    </p>
+    
+    <form method="POST">
+        <div style="margin-bottom: 20px;">
+            <input type="text" name="code" placeholder="৬ ডিজিটের কোড দিন" 
+                   style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 5px; text-align: center; font-size: 20px;"
+                   maxlength="6" required>
+        </div>
+        
+        <button type="submit" style="width: 100%; padding: 15px; background: #667eea; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+            ✅ ভেরিফাই করুন
+        </button>
+    </form>
+    
+    <div style="margin-top: 20px; text-align: center;">
+        <a href="/profile" style="color: #667eea;">← প্রোফাইলে ফিরুন</a>
+    </div>
+</div>
+{% endblock %}

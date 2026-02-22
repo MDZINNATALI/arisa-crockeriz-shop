@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .header { background: #667eea; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; }
+        .footer { background: #f8f9fa; padding: 20px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>অর্ডার কনফার্মেশন</h1>
+        </div>
+        <div class="content">
+            <h2>প্রিয় {{ order.customer.username }},</h2>
+            <p>আপনার অর্ডারটি কনফার্ম হয়েছে।</p>
+            <p><strong>অর্ডার নম্বর:</strong> {{ order.order_number }}</p>
+            <p><strong>মোট মূল্য:</strong> ৳{{ order.total_amount }}</p>
+            <h3>অর্ডার আইটেম:</h3>
+            <ul>
+            {% for item in order.items %}
+                <li>{{ item.product_name }} x {{ item.quantity }} - ৳{{ item.total }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+        <div class="footer">
+            <p>ধন্যবাদ আমাদের সাথে থাকার জন্য</p>
+        </div>
+    </div>
+</body>
+</html>

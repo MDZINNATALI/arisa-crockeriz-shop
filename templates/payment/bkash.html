@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}বিকাশ পেমেন্ট{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-container {
+        max-width: 500px;
+        margin: 0 auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .payment-header {
+        margin-bottom: 2rem;
+    }
+    
+    .payment-header h1 {
+        color: #E2136E;
+        margin-bottom: 0.5rem;
+    }
+    
+    .payment-details {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+    
+    .instruction {
+        color: #666;
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+    
+    .bkash-number {
+        font-size: 2rem;
+        color: #E2136E;
+        font-weight: bold;
+        margin: 1rem 0;
+        padding: 1rem;
+        background: white;
+        border: 2px dashed #E2136E;
+        border-radius: 10px;
+    }
+    
+    .amount {
+        font-size: 1.5rem;
+        color: #333;
+        margin: 1rem 0;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+        text-align: left;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #555;
+    }
+    
+    input {
+        width: 100%;
+        padding: 0.8rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+    
+    .btn-confirm {
+        width: 100%;
+        padding: 1rem;
+        background: #E2136E;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="payment-container">
+    <div class="payment-header">
+        <h1>📱 বিকাশ পেমেন্ট</h1>
+        <p>অর্ডার #{{ order.order_number }}</p>
+    </div>
+    
+    <div class="payment-details">
+        <div class="instruction">
+            নিচের নম্বরে বিকাশ করুন এবং তথ্য দিন:
+        </div>
+        <div class="bkash-number">
+            01760638356
+        </div>
+        <div class="amount">
+            মোট: ৳{{ "%.2f"|format(order.total_amount) }}
+        </div>
+    </div>
+    
+    <form action="/confirm-payment/{{ order.id }}" method="POST">
+        <div class="form-group">
+            <label>আপনার বিকাশ নম্বর:</label>
+            <input type="text" name="payment_number" placeholder="01XXXXXXXXX" required>
+        </div>
+        
+        <div class="form-group">
+            <label>ট্রাঞ্জেকশন আইডি:</label>
+            <input type="text" name="transaction_id" placeholder="8N7A3D9B" required>
+        </div>
+        
+        <button type="submit" class="btn-confirm">✅ পেমেন্ট কনফার্ম করুন</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}প্রোডাক্ট লিস্ট - এডমিন{% endblock %}
+
+{% block extra_css %}
+<style>
+    .products-header {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .products-header h1 {
+        color: #333;
+    }
+    
+    .btn-add {
+        background: #28a745;
+        color: white;
+        padding: 0.8rem 2rem;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    
+    .products-table {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        overflow-x: auto;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    th {
+        background: #667eea;
+        color: white;
+        padding: 1rem;
+        text-align: left;
+    }
+    
+    td {
+        padding: 1rem;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .product-image {
+        width: 50px;
+        height: 50px;
+        background: #f8f9fa;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .stock-badge {
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+    }
+    
+    .in-stock {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .low-stock {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .out-of-stock {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .action-btns {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .btn-edit {
+        background: #4ecdc4;
+        color: white;
+        padding: 0.3rem 1rem;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    
+    .btn-delete {
+        background: #ff6b6b;
+        color: white;
+        padding: 0.3rem 1rem;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    
+    .featured-badge {
+        color: #ffc107;
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="products-header">
+    <h1>📦 প্রোডাক্ট লিস্ট</h1>
+    <a href="/admin/products/add" class="btn-add">➕ নতুন প্রোডাক্ট</a>
+</div>
+
+<div class="products-table">
+    <table>
+        <thead>
+            <tr>
+                <th>ছবি</th>
+                <th>আইডি</th>
+                <th>নাম</th>
+                <th>ক্যাটাগরি</th>
+                <th>মূল্য</th>
+                <th>স্টক</th>
+                <th>ফিচার্ড</th>
+                <th>অ্যাকশন</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>
+                    <div class="product-image">
+                        {% if product.image %}
+                            <img src="{{ url_for('static', filename='uploads/' + product.image) }}" alt="{{ product.name }}" style="width:100%; height:100%; object-fit:cover;">
+                        {% else %}
+                            📷
+                        {% endif %}
+                    </div>
+                </td>
+                <td>{{ product.id }}</td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.category }}</td>
+                <td>৳{{ "%.2f"|format(product.price) }}</td>
+                <td>
+                    {% if product.stock > 10 %}
+                        <span class="stock-badge in-stock">{{ product.stock }}</span>
+                    {% elif product.stock > 0 %}
+                        <span class="stock-badge low-stock">{{ product.stock }}</span>
+                    {% else %}
+                        <span class="stock-badge out-of-stock">স্টক শেষ</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if product.featured %}
+                        <span class="featured-badge">⭐</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="action-btns">
+                        <a href="/admin/products/edit/{{ product.id }}" class="btn-edit">✏️ এডিট</a>
+                        <a href="/admin/products/delete/{{ product.id }}" class="btn-delete" onclick="return confirm('ডিলিট করবেন?')">🗑️ ডিলিট</a>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8" style="text-align: center; padding: 3rem;">
+                    কোনো প্রোডাক্ট নেই
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+__pycache__
+*.pyc
+.env
+.git
+README.md
+venv
+env
+instance
+*.db
+*.sqlite
+*.sqlite3

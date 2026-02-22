@@ -1,0 +1,76 @@
+import random
+import time
+from datetime import datetime, timedelta
+{% extends "base.html" %}
+
+{% block title %}আমার প্রোফাইল{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 50px auto; background: white; padding: 30px; border-radius: 10px;">
+    <h1 style="text-align: center; margin-bottom: 30px;">👤 আমার প্রোফাইল</h1>
+    
+    <!-- ইউজার ইনফো -->
+    <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+        <p><strong>ইউজারনেম:</strong> {{ user.username }}</p>
+        <p><strong>ইমেইল:</strong> {{ user.email }} 
+            {% if user.email_verified %}
+                <span style="color: green; font-size: 12px;">(ভেরিফাইড)</span>
+            {% else %}
+                <span style="color: red; font-size: 12px;">(ভেরিফাই করুন)</span>
+            {% endif %}
+        </p>
+        <p><strong>ফোন:</strong> {{ user.phone or 'সেট করা হয়নি' }}
+            {% if user.phone and user.phone_verified %}
+                <span style="color: green; font-size: 12px;">(ভেরিফাইড)</span>
+            {% elif user.phone %}
+                <span style="color: red; font-size: 12px;">(ভেরিফাই করুন)</span>
+            {% endif %}
+        </p>
+        <p><strong>ঠিকানা:</strong> {{ user.address or 'সেট করা হয়নি' }}</p>
+        <p><strong>২-ফ্যাক্টর:</strong> 
+            {% if user.two_factor_enabled %}
+                <span style="color: green;">✅ সক্রিয়</span>
+            {% else %}
+                <span style="color: red;">❌ নিষ্ক্রিয়</span>
+            {% endif %}
+        </p>
+    </div>
+    
+    <!-- 2FA বাটন -->
+    {% if user.two_factor_enabled %}
+    <form action="/disable-2fa" method="POST" style="margin-bottom: 15px;">
+        <button type="submit" style="width: 100%; padding: 15px; background: #dc3545; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+            🔓 ২-ফ্যাক্টর অথেনটিকেশন বন্ধ করুন
+        </button>
+    </form>
+    {% else %}
+    <form action="/enable-2fa" method="POST" style="margin-bottom: 15px;">
+        <button type="submit" style="width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+            🔐 ২-ফ্যাক্টর অথেনটিকেশন চালু করুন
+        </button>
+    </form>
+    {% endif %}
+    
+    <!-- ফোন ভেরিফিকেশন বাটন -->
+    {% if user.phone and not user.phone_verified %}
+    <form action="/verify-phone" method="POST" style="margin-bottom: 15px;">
+        <button type="submit" style="width: 100%; padding: 15px; background: #667eea; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+            📱 ফোন ভেরিফাই করুন
+        </button>
+    </form>
+    {% endif %}
+    
+    <!-- ইমেইল ভেরিফিকেশন বাটন -->
+    {% if not user.email_verified %}
+    <form action="/verify-email" method="POST" style="margin-bottom: 15px;">
+        <button type="submit" style="width: 100%; padding: 15px; background: #667eea; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+            📧 ইমেইল ভেরিফাই করুন
+        </button>
+    </form>
+    {% endif %}
+    
+    <div style="margin-top: 20px; text-align: center;">
+        <a href="/" style="color: #667eea;">← হোম পেজে ফিরুন</a>
+    </div>
+</div>
+{% endblock %}

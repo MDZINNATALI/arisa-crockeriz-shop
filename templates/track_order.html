@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>অর্ডার ট্র্যাকিং</title>
+    <style>
+        .tracking-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+        }
+        .status-step {
+            text-align: center;
+            flex: 1;
+        }
+        .status-step.active .step-circle {
+            background: #28a745;
+            color: white;
+        }
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+        .timeline {
+            margin-top: 30px;
+        }
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            padding: 15px;
+            border-left: 2px solid #667eea;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="tracking-container">
+        <h1>📦 অর্ডার ট্র্যাকিং</h1>
+        <p>অর্ডার: {{ order.order_number }}</p>
+        
+        <div class="status-bar">
+            <div class="status-step active">
+                <div class="step-circle">1</div>
+                <div>পিকআপ</div>
+            </div>
+            <div class="status-step">
+                <div class="step-circle">2</div>
+                <div>গুদামে</div>
+            </div>
+            <div class="status-step">
+                <div class="step-circle">3</div>
+                <div>যাত্রাপথে</div>
+            </div>
+            <div class="status-step">
+                <div class="step-circle">4</div>
+                <div>ডেলিভারি</div>
+            </div>
+        </div>
+        
+        <div class="timeline">
+            {% for update in tracking.updates %}
+            <div class="timeline-item">
+                <div class="date">{{ update.date }}</div>
+                <div class="status">{{ update.status }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

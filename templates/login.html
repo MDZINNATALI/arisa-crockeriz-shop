@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}লগইন - আরিসা ক্রোকারিজ অ্যান্ড গ্রোসারি{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-container {
+        max-width: 400px;
+        margin: 2rem auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #555;
+        font-weight: 500;
+    }
+    
+    input {
+        width: 100%;
+        padding: 0.8rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+    
+    input:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    
+    button {
+        width: 100%;
+        padding: 1rem;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    
+    button:hover {
+        background: #5a67d8;
+    }
+    
+    .links {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+    
+    .links a {
+        color: #667eea;
+        text-decoration: none;
+    }
+    
+    .links a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <h1>🔐 লগইন</h1>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label>ইউজারনেম:</label>
+            <input type="text" name="username" required placeholder="আপনার ইউজারনেম দিন">
+        </div>
+        
+        <div class="form-group">
+            <label>পাসওয়ার্ড:</label>
+            <input type="password" name="password" required placeholder="********">
+        </div>
+        
+        <button type="submit">লগইন করুন</button>
+    </form>
+    
+    <div class="links">
+        <a href="/register">নতুন ইউজার? রেজিস্টার করুন</a>
+    </div>
+</div>
+{% endblock %}

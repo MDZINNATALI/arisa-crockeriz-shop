@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}চেকআউট - আরিসা ক্রোকারিজ অ্যান্ড গ্রোসারি{% endblock %}
+
+{% block extra_css %}
+<style>
+    .checkout-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+    
+    .order-summary {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .checkout-form {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    h2 {
+        color: #333;
+        margin-bottom: 1.5rem;
+    }
+    
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.8rem 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .order-item:last-child {
+        border-bottom: none;
+    }
+    
+    .item-name {
+        color: #333;
+    }
+    
+    .item-price {
+        color: #667eea;
+        font-weight: bold;
+    }
+    
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 2px solid #e0e0e0;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #555;
+        font-weight: 500;
+    }
+    
+    input, textarea, select {
+        width: 100%;
+        padding: 0.8rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+    
+    textarea {
+        height: 100px;
+        resize: vertical;
+    }
+    
+    .payment-methods {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .payment-method {
+        text-align: center;
+        padding: 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .payment-method:hover {
+        border-color: #667eea;
+    }
+    
+    .payment-method.selected {
+        border-color: #667eea;
+        background: #f0f3ff;
+    }
+    
+    .payment-method input {
+        display: none;
+    }
+    
+    .btn-place-order {
+        width: 100%;
+        padding: 1rem;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    
+    .btn-place-order:hover {
+        background: #218838;
+    }
+    
+    @media (max-width: 768px) {
+        .checkout-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="order-summary">
+        <h2>📋 অর্ডার সামারি</h2>
+        
+        {% for item in cart_items %}
+        <div class="order-item">
+            <span class="item-name">{{ item.product.name }} x {{ item.quantity }}</span>
+            <span class="item-price">৳{{ "%.2f"|format(item.product.price * item.quantity) }}</span>
+        </div>
+        {% endfor %}
+        
+        <div class="total-row">
+            <span>মোট:</span>
+            <span>৳{{ "%.2f"|format(total) }}</span>
+        </div>
+    </div>
+    
+    <div class="checkout-form">
+        <h2>📦 অর্ডার তথ্য</h2>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label>পূর্ণ নাম:</label>
+                <input type="text" name="name" value="{{ current_user.username }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>ফোন নম্বর:</label>
+                <input type="text" name="phone" value="{{ current_user.phone }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>ঠিকানা:</label>
+                <textarea name="address" placeholder="আপনার সম্পূর্ণ ঠিকানা" required>{{ current_user.address }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>পেমেন্ট মেথড:</label>
+                <div class="payment-methods">
+                    <label class="payment-method">
+                        <input type="radio" name="payment_method" value="bkash" required>
+                        <span>📱 বিকাশ</span>
+                    </label>
+                    <label class="payment-method">
+                        <input type="radio" name="payment_method" value="nagad" required>
+                        <span>💳 নগদ</span>
+                    </label>
+                    <label class="payment-method">
+                        <input type="radio" name="payment_method" value="rocket" required>
+                        <span>🚀 রকেট</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>অতিরিক্ত নোট (ঐচ্ছিক):</label>
+                <textarea name="notes" placeholder="কোনো বিশেষ নির্দেশনা থাকলে লিখুন"></textarea>
+            </div>
+            
+            <button type="submit" class="btn-place-order">✅ অর্ডার কনফার্ম করুন</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // পেমেন্ট মেথড সিলেক্ট করার জন্য
+    document.querySelectorAll('.payment-method').forEach(method => {
+        method.addEventListener('click', function() {
+            document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+            this.classList.add('selected');
+            this.querySelector('input').checked = true;
+        });
+    });
+</script>
+{% endblock %}

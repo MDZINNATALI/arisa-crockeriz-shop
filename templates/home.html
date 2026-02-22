@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>আমার ব্লগ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        /* ইউজার হেডার স্টাইল */
+        .user-header {
+            background: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .user-header .welcome {
+            font-size: 1.1em;
+            color: #333;
+        }
+        
+        .user-header .welcome span {
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .user-header .auth-links a {
+            text-decoration: none;
+            margin-left: 15px;
+            padding: 5px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .user-header .auth-links a:hover {
+            background: #f0f0f0;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+        }
+        
+        .nav {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-radius: 0 0 10px 10px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 5px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .nav a:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        /* ফ্ল্যাশ মেসেজ স্টাইল */
+        .flash-messages {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .posts {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .post {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .post:hover {
+            transform: translateY(-5px);
+        }
+        
+        .post h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .post .post-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        .post .author {
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .post .date {
+            color: #999;
+        }
+        
+        .post .content {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .post-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: background 0.3s;
+            display: inline-block;
+        }
+        
+        .btn-edit {
+            background: #4ecdc4;
+            color: white;
+        }
+        
+        .btn-edit:hover {
+            background: #45b7aa;
+        }
+        
+        .btn-delete {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #ee5253;
+        }
+        
+        .btn-add {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .btn-add:hover {
+            background: #5a67d8;
+        }
+        
+        .no-posts {
+            background: white;
+            padding: 50px;
+            text-align: center;
+            border-radius: 10px;
+            color: #999;
+        }
+        
+        .no-posts h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .no-posts p {
+            margin-bottom: 20px;
+        }
+        
+        .no-posts a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .no-posts a:hover {
+            text-decoration: underline;
+        }
+        
+        /* পোস্ট ফুটার */
+        .post-footer {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 0.9em;
+            color: #999;
+        }
+        
+        .post-footer span {
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ইউজার হেডার - লগইন/লগআউট দেখাবে -->
+        <div class="user-header">
+            <div class="welcome">
+                👋 
+                {% if current_user.is_authenticated %}
+                    <span>স্বাগতম, {{ current_user.username }}!</span>
+                {% else %}
+                    <span>অতিথি</span>
+                {% endif %}
+            </div>
+            <div class="auth-links">
+                {% if current_user.is_authenticated %}
+                    <a href="/dashboard" style="color: #667eea;">📊 ড্যাশবোর্ড</a>
+                    <a href="/add" style="color: #4ecdc4;">➕ নতুন পোস্ট</a>
+                    <a href="/logout" style="color: #ff6b6b;">🚪 লগআউট</a>
+                {% else %}
+                    <a href="/login" style="color: #667eea;">🔐 লগইন</a>
+                    <a href="/register" style="color: #4ecdc4;">📝 রেজিস্টার</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ফ্ল্যাশ মেসেজ দেখানোর জন্য -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <div class="header">
+            <h1>📝 আমার ব্লগ</h1>
+            <p>Python, Flask, এবং ভালোবাসা দিয়ে তৈরি</p>
+        </div>
+        
+        <div class="nav">
+            <a href="/">🏠 হোম</a>
+            {% if current_user.is_authenticated %}
+                <a href="/add">➕ নতুন পোস্ট</a>
+                <a href="/dashboard">📊 ড্যাশবোর্ড</a>
+            {% endif %}
+            <a href="/about">👤 আমার সম্পর্কে</a>
+        </div>
+        
+        <!-- শুধু লগইন করা ইউজারদের জন্য পোস্ট যোগ বাটন -->
+        {% if current_user.is_authenticated %}
+            <a href="/add" class="btn btn-add">➕ নতুন পোস্ট লিখুন</a>
+        {% endif %}
+        
+        <div class="posts">
+            {% if posts %}
+                {% for post in posts %}
+                <div class="post">
+                    <h2>{{ post.title }}</h2>
+                    
+                    <div class="post-meta">
+                        <span class="author">
+                            👤 
+                            {% if post.author %}
+                                {{ post.author.username }}
+                            {% else %}
+                                অজানা
+                            {% endif %}
+                        </span>
+                        <span class="date">
+                            📅 {% if post.date %}
+                                {{ post.date.strftime('%d %B, %Y at %I:%M %p') }}
+                            {% else %}
+                                তারিখ নেই
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="content">
+                        {{ post.content }}
+                    </div>
+                    
+                    <!-- পোস্ট অ্যাকশন - শুধু মালিক দেখতে পারবে -->
+                    {% if current_user.is_authenticated and post.author and current_user.id == post.author.id %}
+                    <div class="post-actions">
+                        <a href="/edit/{{ post.id }}" class="btn btn-edit">✏️ এডিট</a>
+                        <a href="/delete/{{ post.id }}" class="btn btn-delete" onclick="return confirm('আপনি কি নিশ্চিত?')">🗑️ ডিলিট</a>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="post-footer">
+                        <span>🆔 পোস্ট আইডি: {{ post.id }}</span>
+                        {% if post.author %}
+                            <span>📝 লেখক আইডি: {{ post.author.id }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-posts">
+                    <h2>📭 কোনো পোস্ট নেই</h2>
+                    <p>প্রথম পোস্ট লিখতে "নতুন পোস্ট" বাটনে ক্লিক করুন</p>
+                    {% if current_user.is_authenticated %}
+                        <a href="/add" class="btn btn-add">➕ নতুন পোস্ট লিখুন</a>
+                    {% else %}
+                        <p><a href="/login">লগইন</a> করে প্রথম পোস্ট লিখুন</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

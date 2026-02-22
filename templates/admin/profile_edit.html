@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>এডমিন প্রোফাইল এডিট</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 32px;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            color: #0d47a1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #1976d2;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        input[readonly] {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+        
+        .password-hint {
+            font-size: 13px;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn-update {
+            flex: 2;
+            background: #28a745;
+            color: white;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn-update:hover {
+            background: #218838;
+        }
+        
+        .btn-cancel {
+            flex: 1;
+            background: #6c757d;
+            color: white;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            text-align: center;
+            transition: background 0.3s;
+        }
+        
+        .btn-cancel:hover {
+            background: #5a6268;
+        }
+        
+        .current-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        
+        .current-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+        
+        .current-info span {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 25px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👤 এডমিন প্রোফাইল এডিট</h1>
+        
+        <div class="info-box">
+            <strong>⚠️ পাসওয়ার্ড পরিবর্তন:</strong> নতুন পাসওয়ার্ড দিতে চাইলে নিচের ঘর পূরণ করুন। না দিলে পুরোনো পাসওয়ার্ডই থাকবে।
+        </div>
+        
+        <div class="current-info">
+            <p>📧 বর্তমান ইমেইল: <span>{{ user.email }}</span></p>
+            <p>📱 বর্তমান ফোন: <span>{{ user.phone or 'সেট করা হয়নি' }}</span></p>
+            <p>🏠 বর্তমান ঠিকানা: <span>{{ user.address or 'সেট করা হয়নি' }}</span></p>
+        </div>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label>👤 ইউজারনেম:</label>
+                <input type="text" name="username" value="{{ user.username }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>📧 ইমেইল:</label>
+                <input type="email" name="email" value="{{ user.email }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>📱 ফোন নম্বর:</label>
+                <input type="text" name="phone" value="{{ user.phone or '' }}" placeholder="০১*********">
+            </div>
+            
+            <div class="form-group">
+                <label>🏠 ঠিকানা:</label>
+                <input type="text" name="address" value="{{ user.address or '' }}" placeholder="আপনার সম্পূর্ণ ঠিকানা">
+            </div>
+            
+            <div class="form-group">
+                <label>🔐 নতুন পাসওয়ার্ড (ঐচ্ছিক):</label>
+                <input type="password" name="new_password" placeholder="নতুন পাসওয়ার্ড দিন">
+                <div class="password-hint">কমপক্ষে ৬ অক্ষর। খালি রাখলে পুরোনো পাসওয়ার্ড থাকবে।</div>
+            </div>
+            
+            <div class="btn-group">
+                <button type="submit" class="btn-update">✅ আপডেট করুন</button>
+                <a href="/admin" class="btn-cancel">↩ বাতিল</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
